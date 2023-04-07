@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { motion } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 import { Link } from 'react-scroll';
+import { useInView } from 'react-intersection-observer';
 
 const Background = styled.div`
   background-image: url('https://source.unsplash.com/random');
@@ -33,14 +34,14 @@ const Content = styled.div`
   text-align: center;
 `;
 
-const Title = styled.h1`
+const Title = styled(motion.h1)`
   font-size: 3rem;
   font-weight: bold;
   color: white;
   margin-bottom: 16px;
 `;
 
-const Description = styled.p`
+const Description = styled(motion.p)`
   font-size: 1.25rem;
   color: white;
   margin-bottom: 32px;
@@ -61,23 +62,80 @@ const Button = styled(motion.button)`
 `;
 
 const LandingPage = () => {
+  const animation = useAnimation();
+  const [contentRef, inView] = useInView({
+    threshold: 0.1,
+  });
+
+  React.useEffect(() => {
+    if (inView) {
+      animation.start('visible');
+    }
+  }, [animation, inView]);
+
+  const variants = {
+    hidden: {
+      opacity: 0,
+      y: 50,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: 'easeOut',
+      },
+    },
+  };
+
+  const staggerVariants = {
+    hidden: {
+      opacity: 0,
+    },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.3,
+      },
+    },
+  };
+
+  const parallaxVariants = {
+    hidden: { y: '-50%' },
+    visible: {
+      y: '-60%',
+      transition: { ease: 'linear', duration: 30, loop: Infinity },
+    },
+  };
+
   return (
     <Background>
-      <Overlay />
-      <Content>
-        <Title>Your Stunning Landing Page</Title>
-        <Description>
-          Welcome to our visually stunning landing page, crafted with love and the latest design trends.
+      <motion.div
+        initial="hidden"
+        animate={animation}
+        variants={parallaxVariants}
+      >
+        <Overlay />
+  </motion.div>
+  <Content ref={contentRef}>
+    <motion.div initial="hidden" animate={animation} variants={staggerVariants}>
+      <Title variants={variants}>Abrar's Visually Stunning Landing Pages</Title>
+        <Description variants={variants}>
+        Welcome to our aesthetic focused landing page, crafted with vision and
+          the latest design trends for your next start up
         </Description>
-        <Link to="features" smooth={true} duration={500}>
-          <Button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Explore Features
-          </Button>
-        </Link>
-      </Content>
+          <Link to="features" smooth={true} duration={500}>
+            <Button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          variants={variants}
+            >
+        Explore our Technology
+      </Button>
+    </Link>
+  </motion.div>
+</Content>
+
     </Background>
   );
 };
