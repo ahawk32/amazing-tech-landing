@@ -5,7 +5,7 @@ import { Link } from 'react-scroll';
 import { useInView } from 'react-intersection-observer';
 
 const Background = styled.div`
-  background-image: url('https://source.unsplash.com/random');
+  background-image: url('../../rocks.jpg');
   background-size: cover;
   background-position: center;
   height: 100vh;
